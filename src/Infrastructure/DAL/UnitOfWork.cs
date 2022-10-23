@@ -11,7 +11,7 @@ namespace ToDoOrganizer.Infrastructure.DAL
     {
         public IGenericRepository<ToDoItem> ToDoItemRepo { get; init; }
         public IGenericRepository<Project> ProjectRepo { get; init; }
-        
+
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
 
@@ -25,8 +25,8 @@ namespace ToDoOrganizer.Infrastructure.DAL
             _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-            ToDoItemRepo = new GenericRepository<ToDoItem>(_context, dateTimeProvider, mapper);
-            ProjectRepo = new GenericRepository<Project>(_context, dateTimeProvider, mapper);
+            ToDoItemRepo = new GenericRepository<AppDbContext, ToDoItem>(_context, dateTimeProvider, mapper);
+            ProjectRepo = new GenericRepository<AppDbContext, Project>(_context, dateTimeProvider, mapper);
         }
 
 

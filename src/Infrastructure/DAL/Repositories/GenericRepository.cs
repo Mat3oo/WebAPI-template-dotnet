@@ -8,14 +8,16 @@ using AutoMapper;
 
 namespace ToDoOrganizer.Infrastructure.DAL.Repositories
 {
-    internal class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
+    internal class GenericRepository<TContext, TEntity> : IGenericRepository<TEntity>
+    where TContext : DbContext
+    where TEntity : BaseEntity
     {
-        private readonly AppDbContext _context;
+        private readonly TContext _context;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IMapper _mapper;
         private readonly DbSet<TEntity> _entities;
 
-        public GenericRepository(AppDbContext context, IDateTimeProvider dateTimeProvider, IMapper mapper)
+        public GenericRepository(TContext context, IDateTimeProvider dateTimeProvider, IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
