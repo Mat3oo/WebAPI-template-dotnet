@@ -6,13 +6,8 @@ namespace ToDoOrganizer.Domain.Models
     {
         public Guid Id { get; set; }
 
-        private DateTime? _createdDate;
         [Required]
-        public DateTime CreatedDate
-        {
-            get { return _createdDate ?? DateTime.UtcNow; }
-            set { _createdDate = value; }
-        }
+        public DateTime CreatedDate { get; set; }
 
         [Required]
         public Guid? CreatedBy { get; set; }

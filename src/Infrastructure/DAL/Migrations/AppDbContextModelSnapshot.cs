@@ -53,7 +53,7 @@ namespace Infrastructure.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("ToDoOrganizer.Domain.Models.ToDoItem", b =>
@@ -97,7 +97,7 @@ namespace Infrastructure.DAL.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("ToDoItems");
+                    b.ToTable("ToDoItems", (string)null);
                 });
 
             modelBuilder.Entity("ToDoOrganizer.Domain.Models.ToDoItem", b =>

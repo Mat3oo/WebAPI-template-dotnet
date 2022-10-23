@@ -15,9 +15,9 @@ namespace ToDoOrganizer.Application.Interfaces.DAL.Repositories
         Task<List<MapDest>> GetByConditionAsync<MapDest>(Expression<Func<TEntity, bool>> predicate,
             PaginationFilter? filter = null);
         void Insert(TEntity entity, Guid userId);
-        Task UpdateAsync(TEntity entity, Guid userId);
-        Task DeleteSoftAsync(Guid id, Guid userId);
-        Task DeleteAsync(Guid id, Guid userId);
+        void Update(TEntity entity, Guid userId);
+        void Delete(TEntity entity);
+        void DeleteSoft(TEntity entity, Guid userId);
         Task<long> CountAsync();
         Task<int> SaveChangesAsync();
     }

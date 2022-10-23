@@ -121,43 +121,38 @@ namespace ToDoOrganizer.Infrastructure.DAL.Repositories
         public void Insert(TEntity entity, Guid userId)
         {
             entity.CreatedBy = userId;
+            entity.CreatedDate = _dateTimeProvider.UtcNow;
             _entities.Add(entity);
         }
 
-        public async Task UpdateAsync(TEntity entity, Guid userId)
+        public void Update(TEntity entity, Guid userId)
         {
-            var persistenEntity = await _entities.AsTracking()
-                .FirstAsync(p => p.Id == entity.Id)
-                .ConfigureAwait(false);
+            //1st approach - updated entity is not accessible beyond this update call:
+            // var persistenEntity = await _entities.AsTracking()
+            //     .FirstAsync(p => p.Id == entity.Id)
+            //     .ConfigureAwait(false);
 
-            _context.Entry(persistenEntity!).CurrentValues.SetValues(entity);
-            persistenEntity.UpdateDate = _dateTimeProvider.UtcNow;
-            persistenEntity.UpdatedBy = userId;
-            _entities.Update(persistenEntity);
+            // _context.Entry(persistenEntity!).CurrentValues.SetValues(entity);
+            // persistenEntity.UpdateDate = _dateTimeProvider.UtcNow;
+            // persistenEntity.UpdatedBy = userId;
+            // _entities.Update(persistenEntity);
 
-            //2nd approach - "oneliner" (but entity stays attached and accessible beoynd scope of this update call):
-            //entity.UpdatTime = _dateTimeProvider.UtcNow;
-            //_entities.Attach(entity).State = EntityState.Modified;
+            //2nd approach - entity stays attached and accessible beoynd scope of this update call:
+            entity.UpdateDate = _dateTimeProvider.UtcNow;
+            entity.UpdatedBy = userId;
+            _entities.Attach(entity).State = EntityState.Modified;
         }
 
-        public async Task DeleteAsync(Guid id, Guid userId)
+        public void Delete(TEntity entity)
         {
-            var persistentEntity = await _entities.AsTracking()
-                .FirstAsync(p => p.Id == id)
-                .ConfigureAwait(false);
-
-            _entities.Remove(persistentEntity);
+            _entities.Remove(entity);
         }
 
-        public async Task DeleteSoftAsync(Guid id, Guid userId)
+        public void DeleteSoft(TEntity entity, Guid userId)
         {
-            var persistentEntity = await _entities.AsTracking()
-                .FirstAsync(p => p.Id == id)
-                .ConfigureAwait(false);
-
-            persistentEntity.DeleteDate = _dateTimeProvider.UtcNow;
-            persistentEntity.DeletedBy = userId;
-            _entities.Update(persistentEntity);
+            entity.DeleteDate = _dateTimeProvider.UtcNow;
+            entity.DeletedBy = userId;
+            _entities.Update(entity);
         }
 
         public Task<int> SaveChangesAsync()

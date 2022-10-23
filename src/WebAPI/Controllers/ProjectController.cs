@@ -30,7 +30,7 @@ namespace ToDoOrganizer.WebAPI.Controllers
         [HttpGet(ApiRoutes.Projects.Get, Name = "GetAsync")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var entity = await _uow.ToDoItemRepo.GetByIdAsync<ProjectResponse>(id).ConfigureAwait(false);
+            var entity = await _uow.ProjectRepo.GetByIdAsync<ProjectResponse>(id).ConfigureAwait(false);
             if (entity is null)
             {
                 return NotFound();
@@ -43,10 +43,10 @@ namespace ToDoOrganizer.WebAPI.Controllers
         [HttpGet(ApiRoutes.Projects.GetAll)]
         public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
         {
-            var entities = await _uow.ToDoItemRepo.GetAllAsync<ProjectResponse>(new(filter.PageNumber, filter.PageSize))
+            var entities = await _uow.ProjectRepo.GetAllAsync<ProjectResponse>(new(filter.PageNumber, filter.PageSize))
                 .ConfigureAwait(false);
 
-            var count = Convert.ToUInt32(await _uow.ToDoItemRepo.CountAsync().ConfigureAwait(false));
+            var count = Convert.ToUInt32(await _uow.ProjectRepo.CountAsync().ConfigureAwait(false));
 
             var response = PaginationHelper.CreatePagedReponse<ProjectResponse>(
                 entities,
@@ -59,14 +59,14 @@ namespace ToDoOrganizer.WebAPI.Controllers
         }
 
         [HttpPost(ApiRoutes.Projects.Create)]
-        public async Task<IActionResult> CreateAsync(ProjectCreateRequest sample)
+        public async Task<IActionResult> CreateAsync(ProjectCreateRequest createRequest)
         {
-            var mapped = _mapper.Map<ToDoItem>(sample);
+            var mapped = _mapper.Map<Project>(createRequest);
 
             var userId = new Guid(); //TODO: get userId from token claims
 
-            _uow.ToDoItemRepo.Insert(mapped, userId);
-            await _uow.ToDoItemRepo.SaveChangesAsync().ConfigureAwait(false);
+            _uow.ProjectRepo.Insert(mapped, userId);
+            await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
 
             var mappedBack = _mapper.Map<ProjectResponse>(mapped);
 
@@ -74,21 +74,20 @@ namespace ToDoOrganizer.WebAPI.Controllers
         }
 
         [HttpPost(ApiRoutes.Projects.Update)]
-        public async Task<IActionResult> UpdateAsync(Guid id, ProjectUpdateRequest sample)
+        public async Task<IActionResult> UpdateAsync(Guid id, ProjectUpdateRequest updateRequest)
         {
-            var entity = await _uow.ToDoItemRepo.GetByIdAsync(id).ConfigureAwait(false);
-            if (entity is default(ToDoItem))
+            var entity = await _uow.ProjectRepo.GetByIdAsync(id).ConfigureAwait(false);
+            if (entity is default(Project))
             {
                 return NotFound();
             }
 
-            var mapped = _mapper.Map<ToDoItem>(sample);
-            mapped.Id = id;
+            var mapped = _mapper.Map(updateRequest, entity);
 
             var userId = new Guid(); //TODO: get userId from token claims
 
-            await _uow.ToDoItemRepo.UpdateAsync(mapped, userId).ConfigureAwait(false);
-            await _uow.ToDoItemRepo.SaveChangesAsync().ConfigureAwait(false);
+            _uow.ProjectRepo.Update(mapped, userId);
+            await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
 
             return NoContent();
         }
@@ -96,16 +95,16 @@ namespace ToDoOrganizer.WebAPI.Controllers
         [HttpDelete(ApiRoutes.Projects.Delete)]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            var entity = await _uow.ToDoItemRepo.GetByIdAsync(id).ConfigureAwait(false);
-            if (entity is default(ToDoItem))
+            var entity = await _uow.ProjectRepo.GetByIdAsync(id).ConfigureAwait(false);
+            if (entity is default(Project))
             {
                 return NotFound();
             }
 
             var userId = new Guid(); //TODO: get userId from token claims
 
-            await _uow.ToDoItemRepo.DeleteSoftAsync(id, userId).ConfigureAwait(false);
-            await _uow.ToDoItemRepo.SaveChangesAsync().ConfigureAwait(false);
+            _uow.ProjectRepo.DeleteSoft(entity, userId);
+            await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
 
             return NoContent();
         }
