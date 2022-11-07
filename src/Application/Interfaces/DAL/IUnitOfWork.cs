@@ -1,12 +1,11 @@
 using ToDoOrganizer.Application.Interfaces.DAL.Repositories;
 using ToDoOrganizer.Domain.Models;
 
-namespace ToDoOrganizer.Application.Interfaces.DAL
+namespace ToDoOrganizer.Application.Interfaces.DAL;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        IGenericRepository<ToDoItem> ToDoItemRepo { get; }
-        IGenericRepository<Project> ProjectRepo { get; }
-        Task<int> SaveChangesAsync();
-    }
+    IGenericRepository<ToDoItem> ToDoItemRepo { get; init; }
+    IGenericRepository<Project> ProjectRepo { get; init; }
+    Task<int> SaveChangesAsync(CancellationToken ct = default);
 }

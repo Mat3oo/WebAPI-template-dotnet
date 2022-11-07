@@ -10,103 +10,102 @@ using ToDoOrganizer.Domain.Models;
 using ToDoOrganizer.WebAPI.Helpers;
 using ToDoOrganizer.WebAPI.Interfaces.Services;
 
-namespace ToDoOrganizer.WebAPI.Controllers
+namespace ToDoOrganizer.WebAPI.Controllers;
+
+[ApiController]
+[ApiVersion("1.0")]
+public class ProjectController : ControllerBase
 {
-    [ApiController]
-    [ApiVersion("1.0")]
-    public class ProjectController : ControllerBase
+    private readonly IUnitOfWork _uow;
+    private readonly IMapper _mapper;
+    private readonly IUriService _uriService;
+
+    public ProjectController(IUnitOfWork unitOfWork, IMapper mapper, IUriService uriService)
     {
-        private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
-        private readonly IUriService _uriService;
+        _uow = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _uriService = uriService ?? throw new ArgumentNullException(nameof(uriService));
+    }
 
-        public ProjectController(IUnitOfWork unitOfWork, IMapper mapper, IUriService uriService)
+    [HttpGet(ApiRoutes.Projects.Get, Name = "GetAsync")]
+    public async Task<IActionResult> GetAsync(Guid id, CancellationToken ct = default)
+    {
+        var entity = await _uow.ProjectRepo.GetByIdAsync<ProjectResponse>(id, ct).ConfigureAwait(false);
+        if (entity is null)
         {
-            _uow = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _uriService = uriService ?? throw new ArgumentNullException(nameof(uriService));
+            return NotFound();
         }
 
-        [HttpGet(ApiRoutes.Projects.Get, Name = "GetAsync")]
-        public async Task<IActionResult> GetAsync(Guid id)
-        {
-            var entity = await _uow.ProjectRepo.GetByIdAsync<ProjectResponse>(id).ConfigureAwait(false);
-            if (entity is null)
-            {
-                return NotFound();
-            }
+        var response = new Response<ProjectResponse>(entity);
+        return Ok(response);
+    }
 
-            var response = new Response<ProjectResponse>(entity);
-            return Ok(response);
+    [HttpGet(ApiRoutes.Projects.GetAll)]
+    public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter, CancellationToken ct = default)
+    {
+        var entities = await _uow.ProjectRepo.GetAllAsync<ProjectResponse>(new(filter.PageNumber, filter.PageSize), ct)
+            .ConfigureAwait(false);
+
+        var count = Convert.ToUInt32(await _uow.ProjectRepo.CountAsync(ct).ConfigureAwait(false));
+
+        var response = PaginationHelper.CreatePagedReponse<ProjectResponse>(
+            entities,
+            filter,
+            count,
+            _uriService,
+            Request.Path.Value!); //Request Path could be invalid when api is behind Gateway
+
+        return Ok(response);
+    }
+
+    [HttpPost(ApiRoutes.Projects.Create)]
+    public async Task<IActionResult> CreateAsync(ProjectCreateRequest createRequest)
+    {
+        var mapped = _mapper.Map<Project>(createRequest);
+
+        var userId = new Guid(); //TODO: get userId from token claims
+
+        _uow.ProjectRepo.Insert(mapped, userId);
+        await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
+
+        var mappedBack = _mapper.Map<ProjectResponse>(mapped);
+
+        return CreatedAtRoute(nameof(GetAsync), new { id = mapped.Id }, mappedBack);
+    }
+
+    [HttpPost(ApiRoutes.Projects.Update)]
+    public async Task<IActionResult> UpdateAsync(Guid id, ProjectUpdateRequest updateRequest, CancellationToken ct = default)
+    {
+        var entity = await _uow.ProjectRepo.GetByIdAsync(id, ct).ConfigureAwait(false);
+        if (entity is default(Project))
+        {
+            return NotFound();
         }
 
-        [HttpGet(ApiRoutes.Projects.GetAll)]
-        public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter)
+        var mapped = _mapper.Map(updateRequest, entity);
+
+        var userId = new Guid(); //TODO: get userId from token claims
+
+        _uow.ProjectRepo.Update(mapped, userId);
+        await _uow.ProjectRepo.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+
+        return NoContent();
+    }
+
+    [HttpDelete(ApiRoutes.Projects.Delete)]
+    public async Task<IActionResult> DeleteAsync(Guid id)
+    {
+        var entity = await _uow.ProjectRepo.GetByIdAsync(id).ConfigureAwait(false);
+        if (entity is default(Project))
         {
-            var entities = await _uow.ProjectRepo.GetAllAsync<ProjectResponse>(new(filter.PageNumber, filter.PageSize))
-                .ConfigureAwait(false);
-
-            var count = Convert.ToUInt32(await _uow.ProjectRepo.CountAsync().ConfigureAwait(false));
-
-            var response = PaginationHelper.CreatePagedReponse<ProjectResponse>(
-                entities,
-                filter,
-                count,
-                _uriService,
-                Request.Path.Value!); //Request Path could be invalid when api is behind Gateway
-
-            return Ok(response);
+            return NotFound();
         }
 
-        [HttpPost(ApiRoutes.Projects.Create)]
-        public async Task<IActionResult> CreateAsync(ProjectCreateRequest createRequest)
-        {
-            var mapped = _mapper.Map<Project>(createRequest);
+        var userId = new Guid(); //TODO: get userId from token claims
 
-            var userId = new Guid(); //TODO: get userId from token claims
+        _uow.ProjectRepo.DeleteSoft(entity, userId);
+        await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
 
-            _uow.ProjectRepo.Insert(mapped, userId);
-            await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
-
-            var mappedBack = _mapper.Map<ProjectResponse>(mapped);
-
-            return CreatedAtRoute(nameof(GetAsync), new { id = mapped.Id }, mappedBack);
-        }
-
-        [HttpPost(ApiRoutes.Projects.Update)]
-        public async Task<IActionResult> UpdateAsync(Guid id, ProjectUpdateRequest updateRequest)
-        {
-            var entity = await _uow.ProjectRepo.GetByIdAsync(id).ConfigureAwait(false);
-            if (entity is default(Project))
-            {
-                return NotFound();
-            }
-
-            var mapped = _mapper.Map(updateRequest, entity);
-
-            var userId = new Guid(); //TODO: get userId from token claims
-
-            _uow.ProjectRepo.Update(mapped, userId);
-            await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
-
-            return NoContent();
-        }
-
-        [HttpDelete(ApiRoutes.Projects.Delete)]
-        public async Task<IActionResult> DeleteAsync(Guid id)
-        {
-            var entity = await _uow.ProjectRepo.GetByIdAsync(id).ConfigureAwait(false);
-            if (entity is default(Project))
-            {
-                return NotFound();
-            }
-
-            var userId = new Guid(); //TODO: get userId from token claims
-
-            _uow.ProjectRepo.DeleteSoft(entity, userId);
-            await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
-
-            return NoContent();
-        }
+        return NoContent();
     }
 }
