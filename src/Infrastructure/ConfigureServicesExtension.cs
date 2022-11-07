@@ -1,24 +1,58 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using ToDoOrganizer.Application.Interfaces.DAL;
 using ToDoOrganizer.Infrastructure.DAL;
 
-namespace Infrastructure
+namespace Infrastructure;
+
+public static class ConfigureServicesExtension
 {
-    public static class ConfigureServicesExtension
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        var provider = configuration.GetValue("DbProvider", "InMemory");
+
+        switch (provider)
         {
-            // services.AddDbContext<AppDbContext>(options =>
-            //     options.UseSqlite(configuration.GetConnectionString("Sqlite"),
-            //         b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+            case "Sqlite":
+                {
+                    // dotnet ef migrations add "MigrationName" -c SqliteAppDbContext -o ../Infrastructure/DAL/Migrations/SqliteAppDb -s ../WebAPI -- --DbProvider=Sqlite
+                    services.AddDbContext<SqliteAppDbContext>(options => options.UseSqlite(
+                        configuration.GetConnectionString("Sqlite"),
+                        b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-            services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("inMemory"));
+                    var dbContextDescriptor =
+                        services.Where(x => x.ServiceType == typeof(SqliteAppDbContext)).Single();
 
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+                    services.Replace(new ServiceDescriptor(typeof(AppDbContext),
+                        typeof(SqliteAppDbContext),
+                        dbContextDescriptor.Lifetime));
+                }
+                break;
+            case "PostgreSql":
+                {
+                    services.AddDbContext<PostgreSqlAppDbContext>(options => options.UseNpgsql(
+                        configuration.GetConnectionString("PostgreSql"),
+                        b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-            return services;
+                    var dbContextDescriptor =
+                        services.Where(x => x.ServiceType == typeof(PostgreSqlAppDbContext)).Single();
+
+                    services.Replace(new ServiceDescriptor(typeof(AppDbContext),
+                        typeof(PostgreSqlAppDbContext),
+                        dbContextDescriptor.Lifetime));
+                }
+                break;
+            case "InMemory":
+                services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("MemoryDb"));
+                break;
+            default:
+                throw new Exception($"Unsupported provider: {provider}");
         }
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        return services;
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Infrastructure.DAL.Migrations
+namespace Infrastructure.DAL.Migrations.SqliteAppDb
 {
     public partial class InitialMigration : Migration
     {
