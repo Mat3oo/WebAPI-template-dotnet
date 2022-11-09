@@ -5,7 +5,6 @@ using ToDoOrganizer.Contracts.V1.Filters;
 using ToDoOrganizer.Contracts.V1;
 using ToDoOrganizer.Contracts.V1.Requests;
 using ToDoOrganizer.Contracts.V1.Responses;
-using ToDoOrganizer.Contracts.V1.Responses.Wrappers;
 using ToDoOrganizer.Domain.Models;
 using ToDoOrganizer.WebAPI.Helpers;
 using ToDoOrganizer.WebAPI.Interfaces.Services;
@@ -36,14 +35,14 @@ public class ProjectController : ControllerBase
             return NotFound();
         }
 
-        var response = new Response<ProjectResponse>(entity);
-        return Ok(response);
+        return Ok(entity);
     }
 
     [HttpGet(ApiRoutes.Projects.GetAll)]
     public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter, CancellationToken ct = default)
     {
-        var entities = await _uow.ProjectRepo.GetAllAsync<ProjectResponse>(new(filter.PageNumber, filter.PageSize), ct)
+        var entities = await _uow.ProjectRepo
+            .GetAllAsync<ProjectResponse>(new(filter.PageNumber, filter.PageSize), ct)
             .ConfigureAwait(false);
 
         var count = Convert.ToUInt32(await _uow.ProjectRepo.CountAsync(ct).ConfigureAwait(false));
@@ -53,20 +52,30 @@ public class ProjectController : ControllerBase
             filter,
             count,
             _uriService,
-            Request.Path.Value!); //Request Path could be invalid when api is behind Gateway
+            Request.Path.Value!); //Request Path could be invalid for the calling user when api is behind Gateway
 
         return Ok(response);
     }
 
     [HttpPost(ApiRoutes.Projects.Create)]
-    public async Task<IActionResult> CreateAsync(ProjectCreateRequest createRequest)
+    public async Task<IActionResult> CreateAsync(ProjectCreateRequest createRequest, CancellationToken ct = default)
     {
+        #region Manual validation - this region is here only for example purpouse, cuz automatic validation is used
+        // // inject "IValidator<ProjectCreateRequest>" in ctor
+        // var validationResult = await _projectCreateRequestValidator.ValidateAsync(createRequest, ct).ConfigureAwait(false);
+        // if (!validationResult.IsValid)
+        // {
+        //     validationResult.AddToModelState(this.ModelState);
+        //     return ValidationProblem();
+        // }
+        #endregion
+
         var mapped = _mapper.Map<Project>(createRequest);
 
         var userId = new Guid(); //TODO: get userId from token claims
 
         _uow.ProjectRepo.Insert(mapped, userId);
-        await _uow.ProjectRepo.SaveChangesAsync().ConfigureAwait(false);
+        await _uow.ProjectRepo.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
         var mappedBack = _mapper.Map<ProjectResponse>(mapped);
 
