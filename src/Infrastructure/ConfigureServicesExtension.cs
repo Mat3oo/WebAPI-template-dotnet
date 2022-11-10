@@ -3,7 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ToDoOrganizer.Application.Interfaces.DAL;
+using ToDoOrganizer.Application.Interfaces.Other;
 using ToDoOrganizer.Infrastructure.DAL;
+using ToDoOrganizer.Infrastructure.Services.Other;
 
 namespace Infrastructure;
 
@@ -50,6 +52,8 @@ public static class ConfigureServicesExtension
             default:
                 throw new Exception($"Unsupported provider: {provider}");
         }
+
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
