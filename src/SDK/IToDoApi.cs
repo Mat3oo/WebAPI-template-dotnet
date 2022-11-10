@@ -10,10 +10,10 @@ namespace ToDoOrganizer.SDK
     public interface IToDoApiV1
     {
         [Get(ApiRoutes.Projects.Get)]
-        Task<ApiResponse<Response<ProjectResponse>>> GetAsync(Guid id);
+        Task<ApiResponse<ProjectResponse>> GetAsync(Guid id);
 
         [Get(ApiRoutes.Projects.GetAll)]
-        Task<ApiResponse<Response<List<ProjectResponse>>>> GetAllPagedAsync([Query] PaginationFilter filter);
+        Task<ApiResponse<List<ProjectResponse>>> GetAllPagedAsync([Query] PaginationFilter filter);
 
         [Post(ApiRoutes.Projects.Create)]
         Task<ApiResponse<ProjectResponse>> CreateAsync([Body] ProjectCreateRequest sample);
