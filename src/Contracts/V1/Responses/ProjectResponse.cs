@@ -1,8 +1,3 @@
-namespace ToDoOrganizer.Contracts.V1.Responses
-{
-    public class ProjectResponse
-    {
-        public string Name { get; set; } = null!;
-        public string? Description { get; set; }
-    }
-}
+namespace ToDoOrganizer.Contracts.V1.Responses;
+
+public record ProjectResponse(string Name, string? Description);

@@ -1,14 +1,3 @@
-namespace ToDoOrganizer.Domain.Filters
-{
-    public class PaginationFilter
-    {
-        public uint PageNumber { get; }
-        public uint PageSize { get; }
+namespace ToDoOrganizer.Domain.Filters;
 
-        public PaginationFilter(uint pageNumber, uint pageSize)
-        {
-            PageNumber = pageNumber;
-            PageSize = pageSize;
-        }
-    }
-}
+public record PaginationFilter(uint PageNumber, uint PageSize);
