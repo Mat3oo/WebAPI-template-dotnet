@@ -5,15 +5,16 @@ using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using ToDoOrganizer.WebAPI.Interfaces.Services;
+using ToDoOrganizer.WebAPI.Mapping;
 using ToDoOrganizer.WebAPI.Services;
 
 namespace ToDoOrganizer.WebAPI;
 
-public static class ConfigureServicesExtension
+public static partial class ConfigureServicesExtension
 {
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAutoMapper(typeof(Program));
+        services.AddMapper();
 
         services.AddHttpContextAccessor();
         services.AddSingleton<IUriService>(o =>

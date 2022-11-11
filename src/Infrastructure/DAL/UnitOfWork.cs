@@ -1,4 +1,4 @@
-using AutoMapper;
+using MapsterMapper;
 using ToDoOrganizer.Application.Interfaces.DAL;
 using ToDoOrganizer.Application.Interfaces.DAL.Repositories;
 using ToDoOrganizer.Application.Interfaces.Other;

@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ToDoOrganizer.Application.Interfaces.DAL;
 using ToDoOrganizer.Contracts.V1.Filters;
@@ -8,6 +7,7 @@ using ToDoOrganizer.Contracts.V1.Responses;
 using ToDoOrganizer.Domain.Models;
 using ToDoOrganizer.WebAPI.Helpers;
 using ToDoOrganizer.WebAPI.Interfaces.Services;
+using MapsterMapper;
 
 namespace ToDoOrganizer.WebAPI.Controllers;
 

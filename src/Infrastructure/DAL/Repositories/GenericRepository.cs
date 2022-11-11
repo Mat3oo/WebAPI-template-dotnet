@@ -4,7 +4,8 @@ using ToDoOrganizer.Application.Interfaces.DAL.Repositories;
 using ToDoOrganizer.Domain.Models;
 using ToDoOrganizer.Domain.Filters;
 using ToDoOrganizer.Application.Interfaces.Other;
-using AutoMapper;
+using MapsterMapper;
+using Mapster;
 
 namespace ToDoOrganizer.Infrastructure.DAL.Repositories;
 
@@ -47,7 +48,7 @@ where TEntity : BaseEntity
         if (filter is null)
         {
             var queryWithoutPaging = _entities.AsNoTracking();
-            var projectionWithoutPaging = _mapper.ProjectTo<MapDest>(queryWithoutPaging);
+            var projectionWithoutPaging = _mapper.From(queryWithoutPaging).ProjectToType<MapDest>();
 
             return projectionWithoutPaging.ToListAsync(ct);
         }
@@ -59,7 +60,7 @@ where TEntity : BaseEntity
                         .OrderBy(k => k.Id)
                         .Skip(skip)
                         .Take(pageSize);
-        var projection = _mapper.ProjectTo<MapDest>(query);
+        var projection = _mapper.From(query).ProjectToType<MapDest>();
 
         return projection.ToListAsync(ct);
     }
@@ -72,7 +73,7 @@ where TEntity : BaseEntity
     public Task<MapDest?> GetByIdAsync<MapDest>(Guid id, CancellationToken ct = default)
     {
         var query = _entities.AsNoTracking().Where(p => p.Id == id);
-        var projection = _mapper.ProjectTo<MapDest>(query);
+        var projection = _mapper.From(query).ProjectToType<MapDest>();
 
         return projection.FirstOrDefaultAsync(ct);
     }
@@ -102,7 +103,7 @@ where TEntity : BaseEntity
         if (filter is null)
         {
             var queryWithoutPaging = _entities.AsNoTracking().Where(predicate);
-            var projectionWithoutPaging = _mapper.ProjectTo<MapDest>(queryWithoutPaging);
+            var projectionWithoutPaging = _mapper.From(queryWithoutPaging).ProjectToType<MapDest>();
 
             return projectionWithoutPaging.ToListAsync(ct);
         }
@@ -115,7 +116,7 @@ where TEntity : BaseEntity
             .OrderBy(k => k.Id)
             .Skip(skip)
             .Take(pageSize);
-        var projection = _mapper.ProjectTo<MapDest>(query);
+        var projection = _mapper.From(query).ProjectToType<MapDest>();
 
         return projection.ToListAsync(ct);
     }
