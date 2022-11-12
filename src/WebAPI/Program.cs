@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 {
+    app.UseExceptionHandler("/api/error");
     app.UseSwagger();
     app.UseSwaggerUI();
 
