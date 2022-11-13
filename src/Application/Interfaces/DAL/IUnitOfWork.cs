@@ -1,5 +1,6 @@
 using ToDoOrganizer.Application.Interfaces.DAL.Repositories;
-using ToDoOrganizer.Domain.Models;
+using ToDoOrganizer.Domain.Aggregates;
+using ToDoOrganizer.Domain.Entities;
 
 namespace ToDoOrganizer.Application.Interfaces.DAL;
 

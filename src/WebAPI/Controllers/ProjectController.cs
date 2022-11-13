@@ -4,10 +4,10 @@ using ToDoOrganizer.Contracts.V1.Filters;
 using ToDoOrganizer.Contracts.V1;
 using ToDoOrganizer.Contracts.V1.Requests;
 using ToDoOrganizer.Contracts.V1.Responses;
-using ToDoOrganizer.Domain.Models;
 using ToDoOrganizer.WebAPI.Helpers;
 using ToDoOrganizer.WebAPI.Interfaces.Services;
 using MapsterMapper;
+using ToDoOrganizer.Domain.Aggregates;
 
 namespace ToDoOrganizer.WebAPI.Controllers;
 

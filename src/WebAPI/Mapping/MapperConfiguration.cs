@@ -1,7 +1,7 @@
 using Mapster;
 using ToDoOrganizer.Contracts.V1.Requests;
 using ToDoOrganizer.Contracts.V1.Responses;
-using ToDoOrganizer.Domain.Models;
+using ToDoOrganizer.Domain.Aggregates;
 
 namespace ToDoOrganizer.WebAPI.Mapping;
 
@@ -11,7 +11,8 @@ class MapperConfiguration : IRegister
     {
         config.NewConfig<Project, ProjectResponse>();
 
-        config.NewConfig<ProjectCreateRequest, Project>();
+        config.NewConfig<ProjectCreateRequest, Project>()
+            .ConstructUsing(c => new Project(Guid.Empty));
 
         config.NewConfig<ProjectUpdateRequest, Project>();
     }

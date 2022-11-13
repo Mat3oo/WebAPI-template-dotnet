@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoOrganizer.Domain.Models;
+using ToDoOrganizer.Domain.Aggregates;
+using ToDoOrganizer.Domain.Entities;
 
 namespace ToDoOrganizer.Infrastructure.DAL;
 
