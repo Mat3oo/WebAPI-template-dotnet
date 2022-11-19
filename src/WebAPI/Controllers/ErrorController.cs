@@ -7,7 +7,7 @@ namespace ToDoOrganizer.WebAPI.Controllers;
 [ApiController]
 public class ErrorController : ControllerBase
 {
-    [Route("api/error")]
+    [HttpGet("api/error")]
     public IActionResult Error()
     {
         Exception exception = HttpContext.Features.Get<IExceptionHandlerFeature>()!.Error;
