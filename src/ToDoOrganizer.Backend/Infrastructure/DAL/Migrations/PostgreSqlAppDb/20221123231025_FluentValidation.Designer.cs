@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ToDoOrganizer.Backend.Infrastructure.DAL;
@@ -11,9 +12,11 @@ using ToDoOrganizer.Backend.Infrastructure.DAL;
 namespace Infrastructure.DAL.Migrations.PostgreSqlAppDb
 {
     [DbContext(typeof(PostgreSqlAppDbContext))]
-    partial class PostgreSqlAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221123231025_FluentValidation")]
+    partial class FluentValidation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

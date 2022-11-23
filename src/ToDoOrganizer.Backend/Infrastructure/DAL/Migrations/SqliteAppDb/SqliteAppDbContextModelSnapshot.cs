@@ -15,9 +15,9 @@ namespace Infrastructure.DAL.Migrations.SqliteAppDb
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.11");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
 
-            modelBuilder.Entity("ToDoOrganizer.Backend.Domain.Models.Project", b =>
+            modelBuilder.Entity("ToDoOrganizer.Backend.Domain.Aggregates.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -37,12 +37,12 @@ namespace Infrastructure.DAL.Migrations.SqliteAppDb
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(50)
+                        .HasMaxLength(1000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("UpdateDate")
@@ -56,7 +56,7 @@ namespace Infrastructure.DAL.Migrations.SqliteAppDb
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("ToDoOrganizer.Backend.Domain.Models.ToDoItem", b =>
+            modelBuilder.Entity("ToDoOrganizer.Backend.Domain.Entities.ToDoItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,12 +76,13 @@ namespace Infrastructure.DAL.Migrations.SqliteAppDb
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsCompleted")
-                        .HasMaxLength(50)
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ProjectId")
@@ -100,16 +101,17 @@ namespace Infrastructure.DAL.Migrations.SqliteAppDb
                     b.ToTable("ToDoItems");
                 });
 
-            modelBuilder.Entity("ToDoOrganizer.Backend.Domain.Models.ToDoItem", b =>
+            modelBuilder.Entity("ToDoOrganizer.Backend.Domain.Entities.ToDoItem", b =>
                 {
-                    b.HasOne("ToDoOrganizer.Backend.Domain.Models.Project", "Project")
+                    b.HasOne("ToDoOrganizer.Backend.Domain.Aggregates.Project", "Project")
                         .WithMany("ToDoItems")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("ToDoOrganizer.Backend.Domain.Models.Project", b =>
+            modelBuilder.Entity("ToDoOrganizer.Backend.Domain.Aggregates.Project", b =>
                 {
                     b.Navigation("ToDoItems");
                 });

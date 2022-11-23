@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using ToDoOrganizer.Backend.Domain.Entities;
 using ToDoOrganizer.Backend.Models;
 
@@ -10,11 +9,8 @@ public class Project : BaseAggregateRoot
     {
     }
 
-    [Required]
-    [MaxLength(50)]
     public string Name { get; set; } = null!;
 
-    [MaxLength(50)]
     public string? Description { get; set; }
 
     public ICollection<ToDoItem> ToDoItems { get; set; } = new HashSet<ToDoItem>();

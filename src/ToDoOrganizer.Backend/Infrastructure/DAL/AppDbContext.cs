@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ToDoOrganizer.Backend.Domain.Aggregates;
 using ToDoOrganizer.Backend.Domain.Entities;
+using ToDoOrganizer.Backend.Infrastructure.DAL.Configurations;
 
 namespace ToDoOrganizer.Backend.Infrastructure.DAL;
 
@@ -17,7 +18,7 @@ internal class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Project>().HasQueryFilter(entity => entity.DeleteDate == null);
-        modelBuilder.Entity<ToDoItem>().HasQueryFilter(entity => entity.DeleteDate == null);
+        modelBuilder.ApplyConfiguration(new ToDoItemConfiguration());
+        modelBuilder.ApplyConfiguration(new ProjectConfiguration());
     }
 }
