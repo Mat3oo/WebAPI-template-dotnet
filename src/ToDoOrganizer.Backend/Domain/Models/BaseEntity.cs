@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using ToDoOrganizer.Backend.Domain.Common.Models;
 
 namespace ToDoOrganizer.Backend.Domain.Models;
@@ -8,10 +7,8 @@ public abstract class BaseEntity : Entity
     protected BaseEntity(Guid id) : base(id)
     { }
 
-    [Required]
     public DateTime CreatedDate { get; set; }
 
-    [Required]
     public Guid? CreatedBy { get; set; }
 
     public DateTime? UpdateDate { get; set; }

@@ -1,5 +1,5 @@
 using ToDoOrganizer.Backend.Domain.Entities;
-using ToDoOrganizer.Backend.Models;
+using ToDoOrganizer.Backend.Domain.Models;
 
 namespace ToDoOrganizer.Backend.Domain.Aggregates;
 

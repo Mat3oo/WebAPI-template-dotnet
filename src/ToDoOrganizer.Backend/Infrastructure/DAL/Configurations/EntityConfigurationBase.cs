@@ -13,6 +13,7 @@ internal abstract class EntityConfigurationBase<TEntity> : IEntityTypeConfigurat
         builder.Property(p => p.CreatedBy).IsRequired();
 
         builder.Property(p => p.CreatedDate)
+            .IsRequired()
             .HasConversion(
                 toProvider => toProvider.ToUniversalTime(),
                 fromProvider => new DateTime(fromProvider.Ticks, DateTimeKind.Utc));

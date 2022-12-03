@@ -1,6 +1,4 @@
-using ToDoOrganizer.Backend.Domain.Models;
-
-namespace ToDoOrganizer.Backend.Models;
+namespace ToDoOrganizer.Backend.Domain.Models;
 
 public abstract class BaseAggregateRoot : BaseEntity
 {
