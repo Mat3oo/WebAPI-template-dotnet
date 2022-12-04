@@ -15,7 +15,7 @@ internal sealed class ProjectConfiguration : EntityConfigurationBase<Project>
             .HasForeignKey(p => p.ProjectId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(p => p.Name).IsRequired().HasMaxLength(100);
+        builder.Property(p => p.Name).IsRequired();
         builder.Property(p => p.Description).HasMaxLength(1000);
     }
 }

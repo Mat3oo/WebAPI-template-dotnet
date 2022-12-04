@@ -15,6 +15,6 @@ internal sealed class ToDoItemConfiguration : EntityConfigurationBase<ToDoItem>
             .HasForeignKey(p => p.ProjectId);
 
         builder.Property(p => p.IsCompleted).IsRequired().HasDefaultValue(false);
-        builder.Property(p => p.Name).IsRequired().HasMaxLength(100);
+        builder.Property(p => p.Name).IsRequired();
     }
 }
