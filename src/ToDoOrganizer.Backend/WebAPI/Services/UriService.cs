@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.WebUtilities;
-using ToDoOrganizer.Backend.Contracts.V1.Filters;
+using ToDoOrganizer.Backend.Contracts.V1.Requests.Filters;
 using ToDoOrganizer.Backend.WebAPI.Interfaces.Services;
 
 namespace ToDoOrganizer.Backend.WebAPI.Services

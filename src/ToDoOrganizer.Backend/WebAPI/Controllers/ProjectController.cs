@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ToDoOrganizer.Backend.Application.Interfaces.DAL;
-using ToDoOrganizer.Backend.Contracts.V1.Filters;
+using ToDoOrganizer.Backend.Contracts.V1.Requests.Filters;
 using ToDoOrganizer.Backend.Contracts.V1;
 using ToDoOrganizer.Backend.Contracts.V1.Requests;
 using ToDoOrganizer.Backend.Contracts.V1.Responses;

@@ -1,4 +1,4 @@
-using ToDoOrganizer.Backend.Contracts.V1.Filters;
+using ToDoOrganizer.Backend.Contracts.V1.Requests.Filters;
 using ToDoOrganizer.Backend.Contracts.V1.Responses.Wrappers;
 using ToDoOrganizer.Backend.WebAPI.Interfaces.Services;
 
