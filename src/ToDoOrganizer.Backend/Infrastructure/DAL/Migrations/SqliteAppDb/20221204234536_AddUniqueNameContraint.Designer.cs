@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoOrganizer.Backend.Infrastructure.DAL;
 
@@ -10,9 +11,11 @@ using ToDoOrganizer.Backend.Infrastructure.DAL;
 namespace Infrastructure.DAL.Migrations.SqliteAppDb
 {
     [DbContext(typeof(SqliteAppDbContext))]
-    partial class SqliteAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221204234536_AddUniqueNameContraint")]
+    partial class AddUniqueNameContraint
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
