@@ -1,9 +1,8 @@
 using Refit;
-using ToDoOrganizer.Backend.Contracts.V1.Filters;
 using ToDoOrganizer.Backend.Contracts.V1;
 using ToDoOrganizer.Backend.Contracts.V1.Requests;
 using ToDoOrganizer.Backend.Contracts.V1.Responses;
-using ToDoOrganizer.Backend.Contracts.V1.Responses.Wrappers;
+using ToDoOrganizer.Backend.Contracts.V1.Requests.Filters;
 
 namespace ToDoOrganizer.Backend.SDK
 {

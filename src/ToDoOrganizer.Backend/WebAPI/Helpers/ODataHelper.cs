@@ -9,7 +9,7 @@ static class ODataHelper
     public static IEdmModel GetEdmModelForProject()
     {
         ODataConventionModelBuilder builder = new();
-        builder.EntitySet<ProjectResponse>("Projects");
+        builder.EntitySet<ProjectODataResponse>("Projects");
         return builder.GetEdmModel();
     }
 }

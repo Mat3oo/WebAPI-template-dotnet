@@ -9,12 +9,13 @@ using ToDoOrganizer.Backend.WebAPI.Interfaces.Services;
 using MapsterMapper;
 using ToDoOrganizer.Backend.Domain.Aggregates;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace ToDoOrganizer.Backend.WebAPI.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-public class ProjectController : ControllerBase
+public class ProjectController : ODataController
 {
     private readonly IUnitOfWork _uow;
     private readonly IMapper _mapper;
@@ -63,7 +64,7 @@ public class ProjectController : ControllerBase
     public IActionResult GetOdata()
     {
         var entities = _uow.ProjectRepo
-            .GetAllQueryable<ProjectResponse>();
+            .GetAllQueryable<ProjectODataResponse>();
 
         return Ok(entities);
     }
