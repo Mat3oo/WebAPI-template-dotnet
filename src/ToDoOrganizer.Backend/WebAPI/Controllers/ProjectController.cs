@@ -8,6 +8,7 @@ using ToDoOrganizer.Backend.WebAPI.Helpers;
 using ToDoOrganizer.Backend.WebAPI.Interfaces.Services;
 using MapsterMapper;
 using ToDoOrganizer.Backend.Domain.Aggregates;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace ToDoOrganizer.Backend.WebAPI.Controllers;
 
@@ -55,6 +56,16 @@ public class ProjectController : ControllerBase
             Request.Path.Value!); //Request Path could be invalid for the calling user when api is behind Gateway
 
         return Ok(response);
+    }
+
+    [HttpGet(ApiRoutes.Projects.GetAllOData)]
+    [EnableQuery(PageSize=10)]
+    public IActionResult GetOdata()
+    {
+        var entities = _uow.ProjectRepo
+            .GetAllQueryable<ProjectResponse>();
+
+        return Ok(entities);
     }
 
     [HttpPost(ApiRoutes.Projects.Create)]

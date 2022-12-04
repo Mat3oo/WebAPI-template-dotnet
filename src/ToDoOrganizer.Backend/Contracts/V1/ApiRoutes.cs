@@ -10,6 +10,7 @@ namespace ToDoOrganizer.Backend.Contracts.V1
             public const string Create = Base + "/projects";
             public const string Update = Base + "/projects/{id}";
             public const string Delete = Base + "/projects/{id}";
+            public const string GetAllOData = Base + "/odata/projects";
         }
     }
 }

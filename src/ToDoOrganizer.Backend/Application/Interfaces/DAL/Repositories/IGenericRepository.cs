@@ -8,6 +8,7 @@ public interface IGenericRepository<TEntity> where TEntity : BaseEntity
 {
     Task<List<TEntity>> GetAllAsync(PaginationFilter? filter = null, CancellationToken ct = default);
     Task<List<MapDest>> GetAllAsync<MapDest>(PaginationFilter? filter = null, CancellationToken ct = default);
+    IQueryable<MapDest> GetAllQueryable<MapDest>();
     Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<MapDest?> GetByIdAsync<MapDest>(Guid id, CancellationToken ct = default);
     Task<List<TEntity>> GetByConditionAsync(Expression<Func<TEntity, bool>> predicate,

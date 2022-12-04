@@ -14,9 +14,9 @@ where TContext : DbContext
 where TEntity : BaseEntity
 {
     private readonly TContext _context;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IMapper _mapper;
-    private readonly DbSet<TEntity> _entities;
+    protected readonly IDateTimeProvider _dateTimeProvider;
+    protected readonly IMapper _mapper;
+    protected readonly DbSet<TEntity> _entities;
 
     public GenericRepository(TContext context, IDateTimeProvider dateTimeProvider, IMapper mapper)
     {
@@ -63,6 +63,14 @@ where TEntity : BaseEntity
         var projection = _mapper.From(query).ProjectToType<MapDest>();
 
         return projection.ToListAsync(ct);
+    }
+
+    public IQueryable<MapDest> GetAllQueryable<MapDest>()
+    {
+        var query = _entities.AsNoTracking()
+            .ProjectToType<MapDest>();
+
+        return query;
     }
 
     public Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
