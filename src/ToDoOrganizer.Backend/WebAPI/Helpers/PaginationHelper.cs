@@ -6,14 +6,14 @@ namespace ToDoOrganizer.Backend.WebAPI.Helpers
 {
     class PaginationHelper
     {
-        public static PagedResponse<List<T>> CreatePagedReponse<T>(
-            List<T> pagedData,
+        public static PagedResponse<T> CreatePagedReponse<T>(
+            IEnumerable<T> pagedData,
             PaginationFilter filter,
             uint totalRecords,
             IUriService uriService,
             string route)
         {
-            var respose = new PagedResponse<List<T>>(pagedData, filter.PageNumber, filter.PageSize);
+            var respose = new PagedResponse<T>(pagedData, filter.PageNumber, filter.PageSize);
 
             var totalPages = Convert.ToDouble(totalRecords) / Convert.ToDouble(filter.PageSize);
             var roundedTotalPages = Convert.ToUInt32(Math.Ceiling(totalPages));
