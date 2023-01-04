@@ -7,11 +7,11 @@ namespace ToDoOrganizer.Backend.WebAPI.Controllers;
 [ApiController]
 public class ErrorController : ControllerBase
 {
-    [HttpGet("api/error")]
+    [Route("api/error")]
     public IActionResult Error()
     {
         Exception exception = HttpContext.Features.Get<IExceptionHandlerFeature>()!.Error;
-        
+
         if (exception is DomainException ex)
         {
             return Problem(detail: ex.Message);
