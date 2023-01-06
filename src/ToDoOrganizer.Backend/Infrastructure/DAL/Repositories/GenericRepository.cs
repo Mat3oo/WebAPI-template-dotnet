@@ -14,29 +14,35 @@ where TContext : DbContext
 where TEntity : BaseEntity
 {
     private readonly TContext _context;
-    protected readonly IDateTimeProvider _dateTimeProvider;
-    protected readonly IMapper _mapper;
-    protected readonly DbSet<TEntity> _entities;
+    protected readonly IDateTimeProvider DateTimeProvider;
+    protected readonly IMapper Mapper;
+    protected readonly TypeAdapterConfig MapperConfig;
+    protected readonly DbSet<TEntity> Entities;
 
-    public GenericRepository(TContext context, IDateTimeProvider dateTimeProvider, IMapper mapper)
+    public GenericRepository(
+        TContext context,
+        IDateTimeProvider dateTimeProvider,
+        IMapper mapper,
+        TypeAdapterConfig mapperConfig)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
-        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _entities = context.Set<TEntity>();
+        DateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        Mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        MapperConfig = mapperConfig ?? throw new ArgumentNullException(nameof(mapperConfig));
+        Entities = context.Set<TEntity>();
     }
 
     public Task<List<TEntity>> GetAllAsync(PaginationFilter? filter = null, CancellationToken ct = default)
     {
         if (filter is null)
         {
-            return _entities.AsNoTracking().ToListAsync(ct);
+            return Entities.AsNoTracking().ToListAsync(ct);
         }
 
         var skip = Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize);
         var pageSize = Convert.ToInt32(filter.PageSize);
 
-        return _entities.AsNoTracking()
+        return Entities.AsNoTracking()
             .OrderBy(k => k.Id)
             .Skip(skip)
             .Take(pageSize)
@@ -47,8 +53,8 @@ where TEntity : BaseEntity
     {
         if (filter is null)
         {
-            var queryWithoutPaging = _entities.AsNoTracking();
-            var projectionWithoutPaging = _mapper.From(queryWithoutPaging).ProjectToType<MapDest>();
+            var queryWithoutPaging = Entities.AsNoTracking();
+            var projectionWithoutPaging = Mapper.From(queryWithoutPaging).ProjectToType<MapDest>();
 
             return projectionWithoutPaging.ToListAsync(ct);
         }
@@ -56,32 +62,32 @@ where TEntity : BaseEntity
         var skip = Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize);
         var pageSize = Convert.ToInt32(filter.PageSize);
 
-        var query = _entities.AsNoTracking()
+        var query = Entities.AsNoTracking()
                         .OrderBy(k => k.Id)
                         .Skip(skip)
                         .Take(pageSize);
-        var projection = _mapper.From(query).ProjectToType<MapDest>();
+        var projection = Mapper.From(query).ProjectToType<MapDest>();
 
         return projection.ToListAsync(ct);
     }
 
     public IQueryable<MapDest> GetAllQueryable<MapDest>()
     {
-        var query = _entities.AsNoTracking()
-            .ProjectToType<MapDest>();
+        var query = Entities.AsNoTracking()
+            .ProjectToType<MapDest>(MapperConfig);
 
         return query;
     }
 
     public Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return _entities.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
+        return Entities.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
     }
 
     public Task<MapDest?> GetByIdAsync<MapDest>(Guid id, CancellationToken ct = default)
     {
-        var query = _entities.AsNoTracking().Where(p => p.Id == id);
-        var projection = _mapper.From(query).ProjectToType<MapDest>();
+        var query = Entities.AsNoTracking().Where(p => p.Id == id);
+        var projection = Mapper.From(query).ProjectToType<MapDest>();
 
         return projection.FirstOrDefaultAsync(ct);
     }
@@ -91,13 +97,13 @@ where TEntity : BaseEntity
     {
         if (filter is null)
         {
-            return _entities.AsNoTracking().Where(predicate).ToListAsync(ct);
+            return Entities.AsNoTracking().Where(predicate).ToListAsync(ct);
         }
 
         var skip = Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize);
         var pageSize = Convert.ToInt32(filter.PageSize);
 
-        return _entities.AsNoTracking()
+        return Entities.AsNoTracking()
             .Where(predicate)
             .OrderBy(k => k.Id)
             .Skip(skip)
@@ -110,8 +116,8 @@ where TEntity : BaseEntity
     {
         if (filter is null)
         {
-            var queryWithoutPaging = _entities.AsNoTracking().Where(predicate);
-            var projectionWithoutPaging = _mapper.From(queryWithoutPaging).ProjectToType<MapDest>();
+            var queryWithoutPaging = Entities.AsNoTracking().Where(predicate);
+            var projectionWithoutPaging = Mapper.From(queryWithoutPaging).ProjectToType<MapDest>();
 
             return projectionWithoutPaging.ToListAsync(ct);
         }
@@ -119,12 +125,12 @@ where TEntity : BaseEntity
         var skip = Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize);
         var pageSize = Convert.ToInt32(filter.PageSize);
 
-        var query = _entities.AsNoTracking()
+        var query = Entities.AsNoTracking()
             .Where(predicate)
             .OrderBy(k => k.Id)
             .Skip(skip)
             .Take(pageSize);
-        var projection = _mapper.From(query).ProjectToType<MapDest>();
+        var projection = Mapper.From(query).ProjectToType<MapDest>();
 
         return projection.ToListAsync(ct);
     }
@@ -132,8 +138,8 @@ where TEntity : BaseEntity
     public void Insert(TEntity entity, Guid userId)
     {
         entity.CreatedBy = userId;
-        entity.CreatedDate = _dateTimeProvider.UtcNow;
-        _entities.Add(entity);
+        entity.CreatedDate = DateTimeProvider.UtcNow;
+        Entities.Add(entity);
     }
 
     public void Update(TEntity entity, Guid userId)
@@ -149,21 +155,21 @@ where TEntity : BaseEntity
         // _entities.Update(persistenEntity);
 
         //2nd approach - entity stays attached and accessible beoynd scope of this update call:
-        entity.UpdateDate = _dateTimeProvider.UtcNow;
+        entity.UpdateDate = DateTimeProvider.UtcNow;
         entity.UpdatedBy = userId;
-        _entities.Attach(entity).State = EntityState.Modified;
+        Entities.Attach(entity).State = EntityState.Modified;
     }
 
     public void Delete(TEntity entity)
     {
-        _entities.Remove(entity);
+        Entities.Remove(entity);
     }
 
     public void DeleteSoft(TEntity entity, Guid userId)
     {
-        entity.DeleteDate = _dateTimeProvider.UtcNow;
+        entity.DeleteDate = DateTimeProvider.UtcNow;
         entity.DeletedBy = userId;
-        _entities.Update(entity);
+        Entities.Update(entity);
     }
 
     public Task<int> SaveChangesAsync(CancellationToken ct = default)
@@ -173,6 +179,6 @@ where TEntity : BaseEntity
 
     public Task<long> CountAsync(CancellationToken ct = default)
     {
-        return _entities.LongCountAsync(ct);
+        return Entities.LongCountAsync(ct);
     }
 }

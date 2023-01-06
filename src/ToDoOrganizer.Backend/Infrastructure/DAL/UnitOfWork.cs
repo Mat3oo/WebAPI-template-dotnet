@@ -1,3 +1,4 @@
+using Mapster;
 using MapsterMapper;
 using ToDoOrganizer.Backend.Application.Interfaces.DAL;
 using ToDoOrganizer.Backend.Application.Interfaces.DAL.Repositories;
@@ -16,18 +17,26 @@ internal class UnitOfWork : IUnitOfWork
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
 
-    public UnitOfWork(AppDbContext dbContext, IDateTimeProvider dateTimeProvider, IMapper mapper)
+    public UnitOfWork(
+        AppDbContext dbContext,
+        IDateTimeProvider dateTimeProvider,
+        IMapper mapper,
+        TypeAdapterConfig mapperConfig)
     {
         if (dateTimeProvider is null)
         {
             throw new ArgumentNullException(nameof(dateTimeProvider));
         }
+        else if (mapperConfig is null)
+        {
+            throw new ArgumentNullException(nameof(mapperConfig));
+        }
 
         _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-        ToDoItemRepo = new GenericRepository<AppDbContext, ToDoItem>(_context, dateTimeProvider, _mapper);
-        ProjectRepo = new GenericRepository<AppDbContext, Project>(_context, dateTimeProvider, _mapper);
+        ToDoItemRepo = new GenericRepository<AppDbContext, ToDoItem>(_context, dateTimeProvider, _mapper, mapperConfig);
+        ProjectRepo = new GenericRepository<AppDbContext, Project>(_context, dateTimeProvider, _mapper, mapperConfig);
     }
 
 
