@@ -35,8 +35,8 @@ internal class UnitOfWork : IUnitOfWork
         _context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
-        ToDoItemRepo = new GenericRepository<AppDbContext, ToDoItem>(_context, dateTimeProvider, _mapper, mapperConfig);
-        ProjectRepo = new GenericRepository<AppDbContext, Project>(_context, dateTimeProvider, _mapper, mapperConfig);
+        ToDoItemRepo = new GenericRepository<ToDoItem>(_context, dateTimeProvider, _mapper, mapperConfig);
+        ProjectRepo = new GenericRepository<Project>(_context, dateTimeProvider, _mapper, mapperConfig);
     }
 
 

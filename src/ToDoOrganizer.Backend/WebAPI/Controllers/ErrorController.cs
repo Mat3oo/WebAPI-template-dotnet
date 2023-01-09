@@ -14,7 +14,7 @@ public class ErrorController : ControllerBase
 
         if (exception is DomainException ex)
         {
-            return Problem(detail: ex.Message);
+            return Problem(statusCode: 400, detail: ex.Message);
         }
 
         return Problem();

@@ -1,4 +1,5 @@
 using Mapster;
+using ToDoOrganizer.Backend.Application.Models.Project;
 using ToDoOrganizer.Backend.Contracts.V1.Requests;
 using ToDoOrganizer.Backend.Contracts.V1.Responses;
 using ToDoOrganizer.Backend.Domain.Aggregates;
@@ -12,9 +13,8 @@ class MapperConfiguration : IRegister
         config.NewConfig<Project, ProjectResponse>();
         config.NewConfig<Project, ProjectODataResponse>();
 
-        config.NewConfig<ProjectCreateRequest, Project>()
-            .ConstructUsing(c => new Project(Guid.Empty));
+        config.NewConfig<ProjectCreateRequest, ProjectCreateEntity>();
 
-        config.NewConfig<ProjectUpdateRequest, Project>();
+        config.NewConfig<ProjectUpdateRequest, ProjectUpdateEntity>();
     }
 }

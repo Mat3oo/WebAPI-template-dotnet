@@ -9,18 +9,17 @@ using Mapster;
 
 namespace ToDoOrganizer.Backend.Infrastructure.DAL.Repositories;
 
-internal class GenericRepository<TContext, TEntity> : IGenericRepository<TEntity>
-where TContext : DbContext
+internal class GenericRepository<TEntity> : IGenericRepository<TEntity>
 where TEntity : BaseEntity
 {
-    private readonly TContext _context;
+    private readonly AppDbContext _context;
     protected readonly IDateTimeProvider DateTimeProvider;
     protected readonly IMapper Mapper;
     protected readonly TypeAdapterConfig MapperConfig;
     protected readonly DbSet<TEntity> Entities;
 
     public GenericRepository(
-        TContext context,
+        AppDbContext context,
         IDateTimeProvider dateTimeProvider,
         IMapper mapper,
         TypeAdapterConfig mapperConfig)

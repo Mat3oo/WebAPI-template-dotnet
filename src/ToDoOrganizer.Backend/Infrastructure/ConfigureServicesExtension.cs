@@ -3,8 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using ToDoOrganizer.Backend.Application.Interfaces.DAL;
+using ToDoOrganizer.Backend.Application.Interfaces.DAL.Repositories;
 using ToDoOrganizer.Backend.Application.Interfaces.Other;
 using ToDoOrganizer.Backend.Infrastructure.DAL;
+using ToDoOrganizer.Backend.Infrastructure.DAL.Repositories;
 using ToDoOrganizer.Backend.Infrastructure.Services.Other;
 
 namespace Infrastructure;
@@ -55,6 +57,7 @@ public static class ConfigureServicesExtension
 
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
+        services.AddScoped(typeof(IGenericReadRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
