@@ -32,78 +32,112 @@ where TEntity : BaseEntity
         Entities = context.Set<TEntity>();
     }
 
-    public Task<List<TEntity>> GetAllAsync(PaginationFilter? filter = null, CancellationToken ct = default)
+    public Task<List<TEntity>> GetAllAsync(PaginationFilter? filter = null,
+        bool includeSoftDeleted = false, CancellationToken ct = default)
     {
+        var query = Entities.AsNoTracking();
+        if (includeSoftDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
         if (filter is null)
         {
-            return Entities.AsNoTracking().ToListAsync(ct);
+            return query.ToListAsync(ct);
         }
 
         var skip = Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize);
         var pageSize = Convert.ToInt32(filter.PageSize);
 
-        return Entities.AsNoTracking()
+        return query
             .OrderBy(k => k.Id)
             .Skip(skip)
             .Take(pageSize)
             .ToListAsync(ct);
     }
 
-    public Task<List<MapDest>> GetAllAsync<MapDest>(PaginationFilter? filter = null, CancellationToken ct = default)
+    public Task<List<MapDest>> GetAllAsync<MapDest>(PaginationFilter? filter = null,
+        bool includeSoftDeleted = false, CancellationToken ct = default)
     {
+        var query = Entities.AsNoTracking();
+        if (includeSoftDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
         if (filter is null)
         {
-            var queryWithoutPaging = Entities.AsNoTracking();
-            var projectionWithoutPaging = Mapper.From(queryWithoutPaging).ProjectToType<MapDest>();
-
+            var projectionWithoutPaging = Mapper.From(query).ProjectToType<MapDest>();
             return projectionWithoutPaging.ToListAsync(ct);
         }
 
         var skip = Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize);
         var pageSize = Convert.ToInt32(filter.PageSize);
 
-        var query = Entities.AsNoTracking()
-                        .OrderBy(k => k.Id)
-                        .Skip(skip)
-                        .Take(pageSize);
+        query = query
+            .OrderBy(k => k.Id)
+            .Skip(skip)
+            .Take(pageSize);
         var projection = Mapper.From(query).ProjectToType<MapDest>();
 
         return projection.ToListAsync(ct);
     }
 
-    public IQueryable<MapDest> GetAllQueryable<MapDest>()
+    public IQueryable<MapDest> GetAllQueryable<MapDest>(bool includeSoftDeleted = false)
     {
-        var query = Entities.AsNoTracking()
-            .ProjectToType<MapDest>(MapperConfig);
+        var query = Entities.AsNoTracking();
+        if (includeSoftDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
 
-        return query;
+        var projection = query.ProjectToType<MapDest>(MapperConfig);
+        return projection;
     }
 
-    public Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    public Task<TEntity?> GetByIdAsync(Guid id, bool includeSoftDeleted = false, CancellationToken ct = default)
     {
-        return Entities.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
+        var query = Entities.AsNoTracking();
+        if (includeSoftDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
+        return query.FirstOrDefaultAsync(s => s.Id == id, ct);
     }
 
-    public Task<MapDest?> GetByIdAsync<MapDest>(Guid id, CancellationToken ct = default)
+    public Task<MapDest?> GetByIdAsync<MapDest>(Guid id, bool includeSoftDeleted = false, CancellationToken ct = default)
     {
-        var query = Entities.AsNoTracking().Where(p => p.Id == id);
+        var query = Entities.AsNoTracking();
+        if (includeSoftDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
+        query = query.Where(p => p.Id == id);
         var projection = Mapper.From(query).ProjectToType<MapDest>();
 
         return projection.FirstOrDefaultAsync(ct);
     }
 
     public Task<List<TEntity>> GetByConditionAsync(Expression<Func<TEntity, bool>> predicate,
-        PaginationFilter? filter = null, CancellationToken ct = default)
+        PaginationFilter? filter = null, bool includeSoftDeleted = false, CancellationToken ct = default)
     {
+        var query = Entities.AsNoTracking();
+        if (includeSoftDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
         if (filter is null)
         {
-            return Entities.AsNoTracking().Where(predicate).ToListAsync(ct);
+            return query.Where(predicate).ToListAsync(ct);
         }
 
         var skip = Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize);
         var pageSize = Convert.ToInt32(filter.PageSize);
 
-        return Entities.AsNoTracking()
+        return query
             .Where(predicate)
             .OrderBy(k => k.Id)
             .Skip(skip)
@@ -112,11 +146,17 @@ where TEntity : BaseEntity
     }
 
     public Task<List<MapDest>> GetByConditionAsync<MapDest>(Expression<Func<TEntity, bool>> predicate,
-         PaginationFilter? filter = null, CancellationToken ct = default)
+         PaginationFilter? filter = null, bool includeSoftDeleted = false, CancellationToken ct = default)
     {
+        var query = Entities.AsNoTracking();
+        if (includeSoftDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
         if (filter is null)
         {
-            var queryWithoutPaging = Entities.AsNoTracking().Where(predicate);
+            var queryWithoutPaging = query.Where(predicate);
             var projectionWithoutPaging = Mapper.From(queryWithoutPaging).ProjectToType<MapDest>();
 
             return projectionWithoutPaging.ToListAsync(ct);
@@ -125,7 +165,7 @@ where TEntity : BaseEntity
         var skip = Convert.ToInt32((filter.PageNumber - 1) * filter.PageSize);
         var pageSize = Convert.ToInt32(filter.PageSize);
 
-        var query = Entities.AsNoTracking()
+        query = query
             .Where(predicate)
             .OrderBy(k => k.Id)
             .Skip(skip)
@@ -177,8 +217,14 @@ where TEntity : BaseEntity
         return _context.SaveChangesAsync(ct);
     }
 
-    public Task<long> CountAsync(CancellationToken ct = default)
+    public Task<long> CountAsync(bool includeSoftDeleted = false, CancellationToken ct = default)
     {
-        return Entities.LongCountAsync(ct);
+        var query = Entities.AsNoTracking();
+        if (includeSoftDeleted)
+        {
+            query = query.IgnoreQueryFilters();
+        }
+
+        return query.LongCountAsync(ct);
     }
 }

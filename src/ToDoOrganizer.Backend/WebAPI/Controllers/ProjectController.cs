@@ -31,7 +31,7 @@ public class ProjectController : ODataController
     [HttpGet(ApiRoutes.Projects.Get, Name = "GetAsync")]
     public async Task<IActionResult> GetAsync(Guid id, CancellationToken ct = default)
     {
-        var entity = await _uow.ProjectRepo.GetByIdAsync<ProjectResponse>(id, ct).ConfigureAwait(false);
+        var entity = await _uow.ProjectRepo.GetByIdAsync<ProjectResponse>(id, ct: ct).ConfigureAwait(false);
         if (entity is null)
         {
             return NotFound();
@@ -44,10 +44,10 @@ public class ProjectController : ODataController
     public async Task<IActionResult> GetAllPagedAsync([FromQuery] PaginationFilter filter, CancellationToken ct = default)
     {
         var entities = await _uow.ProjectRepo
-            .GetAllAsync<ProjectResponse>(new(filter.PageNumber, filter.PageSize), ct)
+            .GetAllAsync<ProjectResponse>(new(filter.PageNumber, filter.PageSize), ct: ct)
             .ConfigureAwait(false);
 
-        var count = Convert.ToUInt32(await _uow.ProjectRepo.CountAsync(ct).ConfigureAwait(false));
+        var count = Convert.ToUInt32(await _uow.ProjectRepo.CountAsync(ct: ct).ConfigureAwait(false));
 
         var response = PaginationHelper.CreatePagedReponse<ProjectResponse>(
             entities,
@@ -60,7 +60,7 @@ public class ProjectController : ODataController
     }
 
     [HttpGet(ApiRoutes.Projects.GetAllOData)]
-    [EnableQuery(PageSize=10)]
+    [EnableQuery(PageSize = 10)]
     public IActionResult GetOdata()
     {
         var entities = _uow.ProjectRepo
@@ -97,7 +97,7 @@ public class ProjectController : ODataController
     [HttpPost(ApiRoutes.Projects.Update)]
     public async Task<IActionResult> UpdateAsync(Guid id, ProjectUpdateRequest updateRequest, CancellationToken ct = default)
     {
-        var entity = await _uow.ProjectRepo.GetByIdAsync(id, ct).ConfigureAwait(false);
+        var entity = await _uow.ProjectRepo.GetByIdAsync(id, ct: ct).ConfigureAwait(false);
         if (entity is default(Project))
         {
             return NotFound();
